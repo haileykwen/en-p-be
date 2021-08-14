@@ -41,6 +41,8 @@ router.post("/signin", (req, res) => {
             bcrypt.compare(password, success[0].password, (error, response) => {
                 if (error) res.status(500).send(error);
                 if (response) {
+                    req.session.user = success;
+                    console.log(req.session.user);
                     res.status(200).send(success);
                 } else {
                     res.status(400).send({ message: "Wrong email or password!" });
@@ -50,6 +52,18 @@ router.post("/signin", (req, res) => {
             res.status(400).send({ message: "Email doesn't registered yet!"});
         }
     });
+});
+
+router.get("/session", (req, res) => {
+    if (req.session.user) {
+        res.send({ loggedIn: true, user: req.session.user });
+    } else {
+        res.send({ loggedIn: false });
+    }
+});
+
+router.get("/signout", (req, res) => {
+    req.session.destroy();
 });
 
 module.exports = router;
