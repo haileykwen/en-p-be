@@ -10,32 +10,38 @@ router.post("/signup", (req, res) => {
     const id = uuidv4();
     const created_at = new Date().getTime();
 
-    bcrypt.hash(password, saltRounds, (err, hash) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send(err);
+    const sqlCheckEmail = "SELECT * FROM users WHERE email = ?";
+    db.query(sqlCheckEmail, email, (error, success) => {
+        if (error) res.status(500).send(error);
+        if (success.length > 0) {
+            res.status(400).send({ message: "Email already registered!" });
         } else {
-            const sqlCreateUser = "INSERT INTO users (user_id, full_name, email, password, created_at) VALUES (?, ?, ?, ?, ?)";
-            db.query(sqlCreateUser, [id, full_name, email, hash, `${created_at}`], (error, success) => {
-                if (error) res.status(500).send(error);
-                if (success) res.status(200).send(success);
-            })
+            bcrypt.hash(password, saltRounds, (err, hash) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send(err);
+                } else {
+                    const sqlCreateUser = "INSERT INTO users (user_id, full_name, email, password, created_at) VALUES (?, ?, ?, ?, ?)";
+                    db.query(sqlCreateUser, [id, full_name, email, hash, `${created_at}`], (error, success) => {
+                        if (error) res.status(500).send(error);
+                        if (success) res.status(200).send(success);
+                    });
+                }
+            });
         }
-    })
-})
+    });
+});
 
 router.post("/signin", (req, res) => {
     const { email, password } = req.body;
     const sqlGetUser = "SELECT * FROM users where email = ?";
     db.query(sqlGetUser, email, (error, success) => {
-        if (error) console.log(error);
-        else if (success.length > 0) {
+        if (error) res.status(500).send(error);
+        if (success.length > 0) {
             bcrypt.compare(password, success[0].password, (error, response) => {
+                if (error) res.status(500).send(error);
                 if (response) {
-                    res.status(200).send({ 
-                        message: "Signin success!",
-                        data: success
-                    });
+                    res.status(200).send(success);
                 } else {
                     res.status(400).send({ message: "Wrong email or password!" });
                 }
@@ -43,7 +49,7 @@ router.post("/signin", (req, res) => {
         } else {
             res.status(400).send({ message: "Email doesn't registered yet!"});
         }
-    })
-})
+    });
+});
 
 module.exports = router;
