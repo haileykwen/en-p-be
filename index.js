@@ -14,6 +14,13 @@ app.use((req, res, next) => { // Handle error CORS policy
     next();
 });
 app.use(express.json());
+app.use(
+    cors({
+        origin: ["*"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    })
+);
 app.use(cookieParser());
 app.use(
     session({
