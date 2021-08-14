@@ -19,12 +19,12 @@ router.post("/signup", (req, res) => {
             bcrypt.hash(password, saltRounds, (err, hash) => {
                 if (err) {
                     console.log(err);
-                    res.status(500).send(err);
+                    res.status(500).send({ message: "Server error cannot create account at this time. Try again later" });
                 } else {
                     const sqlCreateUser = "INSERT INTO users (user_id, full_name, email, password, created_at) VALUES (?, ?, ?, ?, ?)";
                     db.query(sqlCreateUser, [id, full_name, email, hash, `${created_at}`], (error, success) => {
-                        if (error) res.status(500).send(error);
-                        if (success) res.status(200).send(success);
+                        if (error) res.status(500).send({ message: "Server error cannot create account at this time. Try again later"});
+                        if (success) res.status(200).send({ message: "Create account successful!"});
                     });
                 }
             });
