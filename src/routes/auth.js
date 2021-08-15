@@ -4,6 +4,7 @@ const db = require('../model/db');
 const bcrypt = require("bcryptjs");
 const saltRounds = 10;
 const { v4: uuidv4 } = require('uuid');
+const jwt = require("jsonwebtoken");
 
 router.post("/signup", (req, res) => {
     const { full_name, email, password } = req.body;
@@ -41,9 +42,13 @@ router.post("/signin", (req, res) => {
             bcrypt.compare(password, success[0].password, (error, response) => {
                 if (error) res.status(500).send(error);
                 if (response) {
-                    req.session.user = success;
-                    console.log(req.session.user);
-                    res.status(200).send(success);
+                    const token = jwt.sign({user_id: success[0].user_id}, "haileybadwin");
+                    const { user_id, full_name, email } = success[0];
+                    res.status(200).send({
+                        message: "Signin successful!",
+                        token,
+                        data: { user_id, full_name, email }
+                    });
                 } else {
                     res.status(400).send({ message: "Wrong email or password!" });
                 }

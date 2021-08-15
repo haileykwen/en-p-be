@@ -14,14 +14,14 @@ app.use((req, res, next) => { // Handle error CORS policy
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
 });
-app.use(express.json());
 app.use(
     cors({
-        origin: ["*"],
+        origin: ["http://localhost:3000"],
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     })
 );
+app.use(express.json());
 app.use(cookieParser());
 app.use(
     session({
