@@ -35,8 +35,8 @@ router.post("/view", (req, res) => {
     });
 });
 
-router.delete("/delete", (req, res) => {
-    const { phrase_id } = req.body;
+router.delete("/delete/:phrase_id", (req, res) => {
+    const phrase_id = req.params.phrase_id;
     const sqlDeletePhrase = "DELETE FROM phrases WHERE phrase_id = ?";
 
     db.query(sqlDeletePhrase, phrase_id, (error, success) => {
