@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const saltRounds = 10;
 const { v4: uuidv4 } = require('uuid');
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 router.post("/signup", (req, res) => {
     const { full_name, email, password } = req.body;
@@ -42,7 +43,7 @@ router.post("/signin", (req, res) => {
             bcrypt.compare(password, success[0].password, (error, response) => {
                 if (error) res.status(500).send(error);
                 if (response) {
-                    const token = jwt.sign({user_id: success[0].user_id}, "haileybadwin");
+                    const token = jwt.sign({user_id: success[0].user_id}, process.env.JWT_SECRET);
                     const { user_id, full_name, email } = success[0];
                     res.status(200).send({
                         message: "Signin successful!",
